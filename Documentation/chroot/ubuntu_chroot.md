@@ -23,13 +23,13 @@
 
 
 1. First you need to have your device <u>rooted</u>.
-2. You need to flash [Busybox NDK](https://github.com/Magisk-Modules-Repo/busybox-ndk) with Magisk.
+2. You need to flash [Busybox NDK](https://github.com/Magisk-Modules-Repo/busybox-ndk) with Magisk or if you use kernelSU you may use it's bundled busybox binary.
 3. Then you need to install the following packages in Termux: 
 
 ```
 pkg update \
 && pkg install x11-repo root-repo \
-&& pkg install termux-x11-nightly sudo pulseaudio
+&& pkg install termux-x11-nightly sudo pulseaudio wget
 ```
 
 
@@ -48,35 +48,37 @@ These steps are from Ivon's blog but I've modified some of the lines. These are 
 su
 ```
 
-2. Create a directory at `/data/local/tmp` for chroot environment
+2. Create a directory at `/data/local` for chroot environment and fix potential permission issues
 ```
-mkdir /data/local/tmp/chrootubuntu
-cd /data/local/tmp/chrootubuntu
+mkdir -p /data/local/chroot/ubuntu
+chmod 755 /data/local/chroot/ubuntu
+chown root:root /data/local/chroot/ubuntu
+cd /data/local/chroot/ubuntu
 ```
 
 3. Download [Ubuntu 24.04 LTS](https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/) rootfs: 
 ```
-curl https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.3-base-arm64.tar.gz -o ubuntu.tar.gz
+curl https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.4-base-arm64.tar.gz -o ubuntu.tar.gz
 
 ```
 
 4. Extract the downloaded file and create sdcard folder
 ```
 tar xpvf ubuntu.tar.gz --numeric-owner
-mkdir sdcard
+mkdir -p sdcard
 ```
 
 5. Create startup script: 
 ```
 cd ..
-vi start_ubuntu.sh
+busybox vi start_ubuntu.sh
 ```
 Copy and paste the following: 
 ```
 #!/bin/sh
 
 # The path of Ubuntu rootfs
-UBUNTUPATH="/data/local/tmp/chrootubuntu"
+UBUNTUPATH="/data/local/chroot/ubuntu"
 
 # Fix setuid issue
 busybox mount -o remount,dev,suid /data
@@ -106,7 +108,8 @@ sh start_ubuntu.sh
 7. The prompt will change to `root@localhost`. If you need to return to Termux just write `exit`. Let's perform some fixes: 
 ```
 echo "nameserver 8.8.8.8" > /etc/resolv.conf
-echo "127.0.0.1 localhost" > /etc/hosts
+echo "127.0.0.1 localhost
+::1 localhost" > /etc/hosts
 
 groupadd -g 3003 aid_inet
 groupadd -g 3004 aid_net_raw
@@ -119,7 +122,7 @@ apt update && apt upgrade
 apt install nano vim net-tools sudo git
 ```
 
-8. Set timezone the interactive shell should prompt you to select your timezone if it doesn't run this: 
+8. Set timezone. The interactive shell should prompt you to select your timezone if it doesn't run this: 
 ```
 dpkg-reconfigure tzdata
 ```
@@ -177,7 +180,7 @@ EOF
 
 14. Exit chroot and modify the `start_ubuntu.sh` script created on step `5`: 
 ```
-vi /data/local/tmp/start_ubuntu.sh
+vi /data/local/chroot/start_ubuntu.sh
 ```
  Comment the last line `busybox chroot $UBUNTUPATH /bin/su - root` and write the following line under it: 
 ```
@@ -187,7 +190,7 @@ If you've installed a different Desktop Environment you need to replace `startxf
 
 15. Let's run the Desktop Environment. Exit chroot environment and download the script with wget and start it on Termux (you can close everything and reopen Termux to be sure you are outside chroot). 
 ```
-wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/main/scripts/chroot/ubuntu/startxfce4_chrootubuntu.sh
+wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/refs/heads/main/scripts/chroot/ubuntu/startxfce4_chrootubuntu.sh
 
 chmod +x startxfce4_chrootubuntu.sh
 ./startxfce4_chrootubuntu.sh
@@ -201,11 +204,11 @@ chmod +x startxfce4_chrootubuntu.sh
 
 * Download Ubuntu 24.04 rootfs: 
 ```
-curl https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.3-base-arm64.tar.gz -o ubuntu.tar.gz
+curl https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.4-base-arm64.tar.gz -o ubuntu.tar.gz
 ```
 
 ---  
-A note if you want to use firefox use the apt repository it's recommended [Firefox](https://support.mozilla.org/en-US/kb/install-firefox-linux).
+* Note if you want to use firefox use the apt repository it's recommended [Firefox](https://support.mozilla.org/en-US/kb/install-firefox-linux#w_install-firefox-deb-package-for-debian-based-distributions-recommended).
 <br>
 
 ## 🎨 Customizations (Nerdfonts, XFCE4 terminal color palettes, etc) <a name=customizations-chroot></a>

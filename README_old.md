@@ -14,7 +14,7 @@ Collection of scripts to launch Desktops with audio in Termux X11. You have also
 ### PROOT-DISTRO (🟠 UBUNTU)
 * 🏁 [First steps](#first-steps-ubuntu-proot)
 * ⚙️ [Installing Desktops](#installing-desktops-ubuntu-proot)
-* ⬇️ [Download scripts to run the desktops](#easy-download-ubuntu-proot)
+* ⬇️ [Download scripts to run the desktops](#script-download-ubuntu-proot)
 
 ### PROOT-DISTRO (🔼 ARCH)
 * 🏁 [First steps](#first-steps-arch)
@@ -268,7 +268,7 @@ apt install sudo nano adduser -y
 ---  
 <br>
 
-## ⬇️ Download scripts easily: <a name=easy-download-ubuntu-proot></a> 
+## ⬇️ Download scripts easily: <a name=script-download-ubuntu-proot></a> 
 * startgnome_ubuntu.sh
 ```
 wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/main/scripts/proot_ubuntu/startgnome_ubuntu.sh

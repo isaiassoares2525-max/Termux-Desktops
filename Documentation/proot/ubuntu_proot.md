@@ -2,7 +2,7 @@
 
 ## PROOT-DISTRO (🟠 UBUNTU)
 * 🏁 [First steps](#first-steps-ubuntu-proot)
-* ⬇️ [Download scripts to run the desktops](#easy-download-ubuntu-proot)
+* ⬇️ [Download scripts to run the desktops](#script-download-ubuntu-proot)
 * ⚙️ [Installing Desktops](#installing-desktops-ubuntu-proot)
 
 <br>
@@ -15,7 +15,7 @@
 ## 🏁 First steps <a name=first-steps-ubuntu-proot></a>
 
 > [!NOTE]  
-> All the process is described in more detail in this [video](https://www.youtube.com/watch?v=_vxhzSG2zVQ) (ourdated).
+> All the process is described in more detail in this [video](https://www.youtube.com/watch?v=_vxhzSG2zVQ) (outdated).
 
 First you need to install the following packages in Termux: 
 ```
@@ -33,21 +33,24 @@ proot-distro login ubuntu
 Update repositories and install any package you want: 
 ```
 apt update && apt upgrade
-
 apt install sudo vim -y
 ```
 
----  
-<br>
+---
+<br> 
 
-## ⬇️ Download scripts easily: <a name=easy-download-ubuntu-proot></a> 
-* startgnome_ubuntu.sh
-```
-wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/main/scripts/proot_ubuntu/startgnome_ubuntu.sh
-```
+## ⬇️ Download launch scripts: <a name=script-download-ubuntu-proot></a>
+
 * startxfce4_ubuntu.sh
+
 ```
 wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/main/scripts/proot_ubuntu/startxfce4_ubuntu.sh
+```
+
+* startplasma_ubuntu.sh
+
+```
+wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/main/scripts/proot_ubuntu/startplasma_ubuntu.sh
 ```
 
 ---  
@@ -55,36 +58,49 @@ wget https://raw.githubusercontent.com/LinuxDroidMaster/Termux-Desktops/main/scr
 
 # ⚙️ Installing Desktops <a name=installing-desktops-ubuntu-proot></a> 
 
-I have use the following [post](https://ivonblog.com/en-us/posts/termux-proot-distro-ubuntu/) from Ivon's blog as a reference for some steps. 
+I have use the following [post](https://ivonblog.com/en-us/posts/termux-proot-distro-ubuntu/) from Ivon's blog as a reference for some steps.
 
-<br>
+## ️️🖥️ Desktop environments
 
-<details>
-<summary><strong> GNOME </strong></summary>
-
-<br>
-
-> [!NOTE]  
-> All the process is described in more detail in this [video](https://www.youtube.com/watch?v=_vxhzSG2zVQ).
-
-<br>
-
+1. Remove PPA:
 
 ```
-# Commands: 
-proot-distro login ubuntu --user droidmaster
+# install ppa-purge
+apt install ppa-purge
+
+# remove mozilla team ppa
+ppa-purge ppa:mozillateam/ppa
 ```
+
+Remove preference files so it doesn't use the ppa:
+
 ```
-sudo apt install dbus-x11 ubuntu-desktop -y
+# use ppa-purge
+ppa-purge ppa:mozillateam/ppa
+
+# remove ppa-purge
+apt autopurge ppa-purge
 ```
-Run this command after it finishes: 
+
+2. Create a new user and switch to the newly created user:
+
 ```
-for file in $(find /usr -type f -iname "*login1*"); do rm -rf $file
-done
+adduser droidmaster
+su - droidmaster
 ```
-Disable snapd as it doesn't work on Termux
+
+3. Install the desktop environment:
+
+* XFCE4
+
 ```
-cat <<EOF | sudo tee /etc/apt/preferences.d/nosnap.pref
+apt install xubuntu-desktop -y
+```
+
+* Remove snap it cannot be used inside termux without a specialized setup.
+
+```
+cat <<EOF | tee /etc/apt/preferences.d/nosnap.pref
 # To prevent repository packages from triggering the installation of Snap,
 # this file forbids snapd from being installed by APT.
 # For more information: https://linuxmint-user-guide.readthedocs.io/en/latest/snap.html
@@ -94,30 +110,73 @@ Pin-Priority: -10
 EOF
 ```
 
-Install firefox: 
+
+* KDE PLASMA
+
 ```
-sudo add-apt-repository ppa:mozillateam/ppa
-sudo apt-get update
-sudo apt-get install firefox-esr
+apt install kubuntu-desktop -y
 ```
 
-Now you can run Ubuntu with GNOME UI from the script I left in the `Download scripts easily` section: 
+* Remove snap it cannot be used inside termux without a specialized setup.
+
 ```
-chmod +x startgnome_ubuntu.sh
-./startgnome_ubuntu.sh
+cat <<EOF | tee /etc/apt/preferences.d/nosnap.pref
+# To prevent repository packages from triggering the installation of Snap,
+# this file forbids snapd from being installed by APT.
+# For more information: https://linuxmint-user-guide.readthedocs.io/en/latest/snap.html
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10
+EOF
 ```
-</details>  
 
-<br>
+* CINNAMON
 
-<details>
-<summary><strong> Other desktosp (XFCE4, Mate, LXDE, etc) </strong></summary>
-<br>
+```
+apt install ubuntucinnamon-desktop
+```
 
-Follow the same [installation steps](https://github.com/LinuxDroidMaster/Termux-Desktops/blob/main/Documentation/proot/debian_proot.md#installing-desktops) as for Debian.
+* Remove snap it cannot be used inside termux without a specialized setup.
 
-</details>  
+```
+cat <<EOF | tee /etc/apt/preferences.d/nosnap.pref
+# To prevent repository packages from triggering the installation of Snap,
+# this file forbids snapd from being installed by APT.
+# For more information: https://linuxmint-user-guide.readthedocs.io/en/latest/snap.html
+Package: snapd
+Pin: release a=*
+Pin-Priority: -10
+EOF
+```
 
----  
-  
+## 🦊 Install Firefox
+Note I used the official Mozilla [support page](https://support.mozilla.or/g/en-US/kb/install-firefox-linux#w_install-firefox-deb-package-for-debian-based-distributions-recommended) for the content below.
 
+* Import the Mozilla APT repository signing key:
+
+```
+wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- | sudo tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null 
+```
+
+* Next, add the Mozilla APT repository to your sources.list:
+```
+cat <<EOF | sudo tee /etc/apt/sources.list.d/mozilla.sources
+Types: deb
+URIs: https://packages.mozilla.org/apt
+Suites: mozilla
+Components: main
+Signed-By: /etc/apt/keyrings/packages.mozilla.org.asc
+EOF 
+```
+
+* Configure APT to prioritize packages from the Mozilla repository:
+
+```
+echo '
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+' | sudo tee /etc/apt/preferences.d/mozilla 
+```
+
+---
