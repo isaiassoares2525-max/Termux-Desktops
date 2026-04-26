@@ -22,5 +22,5 @@ sleep 1
 # See also: https://github.com/termux/proot-distro
 # Argument -- acts as terminator of proot-distro login options processing.
 # All arguments behind it would not be treated as options of PRoot Distro.
-proot-distro login ubuntu --shared-tmp -- /bin/bash -c "export PULSE_SERVER=127.0.0.1 && export XDG_RUNTIME_DIR=/tmp && service dbus start && su - isaias -c 'export DISPLAY=:0; export XDG_RUNTIME_DIR=/tmp; gnome-session --session=gnome-flashback-metacity'"
+proot-distro login ubuntu --shared-tmp -- /bin/bash -c "export PULSE_SERVER=127.0.0.1 && export XDG_RUNTIME_DIR=/tmp && service dbus start && su - isaias -c 'export DISPLAY=:0; export XDG_RUNTIME_DIR=/tmp; dbus-launch --exit-with-session gnome-session --session=gnome-flashback-metacity'"
 exit 0"
